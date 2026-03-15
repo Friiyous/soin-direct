@@ -85,8 +85,8 @@
           <div class="text-sm text-white/70">Délai moyen</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold">500+</div>
-          <div class="text-sm text-white/70">Professionnels</div>
+          <div class="text-3xl font-bold">50+</div>
+          <div class="text-sm text-white/70">Pro PORO</div>
         </div>
         <div class="text-center">
           <div class="text-3xl font-bold">98%</div>

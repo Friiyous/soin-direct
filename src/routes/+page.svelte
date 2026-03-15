@@ -41,13 +41,13 @@
         <div class="text-center md:text-left">
           <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             Des soins à domicile de<br />
-            <span class="text-primary">qualité en Côte d'Ivoire</span>
+            <span class="text-primary">qualité dans le PORO</span>
           </h1>
           <p class="text-xl text-gray-700 dark:text-gray-200 mb-4">
             Votre santé, notre priorité. Recevez des soins professionnels sans vous déplacer.
           </p>
           <p class="text-lg text-gray-500 dark:text-gray-400 mb-8">
-            Simples, rapides, fiables - disponibles dans tout Abidjan
+            Simples, rapides, fiables - disponibles dans toute la région PORO
           </p>
           <div class="flex gap-4 justify-center md:justify-start flex-wrap">
             <a href="/auth/register" class="btn-primary text-lg px-8 py-4">
@@ -261,7 +261,7 @@
           </div>
           <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Proche de chez vous</h3>
           <p class="text-gray-600 dark:text-gray-300">
-            Nous couvrons Abidjan et environs. Un professionnel près de votre domicile.
+            Nous couvrons toute la région PORO. Un professionnel près de votre domicile.
           </p>
         </div>
       </div>
@@ -303,7 +303,7 @@
           <span class="text-xl font-bold">SoinDirect</span>
         </div>
         <p class="text-gray-400">
-          © 2024 SoinDirect Côte d'Ivoire. Tous droits réservés.
+          © 2024 SoinDirect PORO. Tous droits réservés.
         </p>
       </div>
     </div>
