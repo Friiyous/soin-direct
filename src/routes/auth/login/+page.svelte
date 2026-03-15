@@ -32,7 +32,15 @@
       });
 
       if (user?.role === 'admin') goto('/dashboard/admin');
-      else if (user?.role === 'patient') goto('/dashboard/patient');
+      else if (user?.role === 'patient') {
+        // Check if first login (onboarding)
+        const hasSeenOnboarding = localStorage.getItem('onboarding_complete');
+        if (!hasSeenOnboarding) {
+          goto('/dashboard/patient/onboarding');
+        } else {
+          goto('/dashboard/patient');
+        }
+      }
       else goto('/dashboard/pro');
     }
     loading = false;

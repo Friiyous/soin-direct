@@ -10,7 +10,11 @@
     LogOut,
     Menu,
     X,
-    Pill
+    Pill,
+    MessageSquare,
+    FileSignature,
+    FolderOpen,
+    Calendar
   } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
@@ -41,7 +45,11 @@
   const navItems = [
     { href: '/dashboard/patient', label: 'Accueil', icon: Home },
     { href: '/dashboard/patient/demander', label: 'Demander un soin', icon: PlusCircle },
+    { href: '/dashboard/patient/rendez-vous', label: 'Rendez-vous', icon: Calendar },
     { href: '/dashboard/patient/medicaments', label: 'Médicaments', icon: Pill },
+    { href: '/dashboard/patient/chat', label: 'Messages', icon: MessageSquare },
+    { href: '/dashboard/patient/ordonnances', label: 'Ordonnances', icon: FileSignature },
+    { href: '/dashboard/patient/dossier', label: 'Mon dossier', icon: FolderOpen },
     { href: '/dashboard/patient/historique', label: 'Mon historique', icon: FileText }
   ];
 
