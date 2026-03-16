@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Plus, Pencil, Trash2, Search, MapPin, Phone, Clock, Star, ToggleLeft, ToggleRight } from 'lucide-svelte';
+  import { Plus, Pencil, Trash2, Search, MapPin, Phone, Clock, Star, Calendar, RefreshCw, AlertCircle } from 'lucide-svelte';
   import GlassCard from '$lib/components/ui/GlassCard.svelte';
   import Button from '$lib/components/ui/Button.svelte';
 
@@ -16,7 +16,12 @@
     services: string[];
     is_24h: boolean;
     is_de_garde: boolean;
+    garde_start_date?: string;
+    garde_end_date?: string;
   }
+
+  // Cycle de garde : 2 semaines
+  const GARDE_DURATION_DAYS = 14;
 
   let pharmacies: Pharmacy[] = [
     {
@@ -30,7 +35,9 @@
       longitude: -5.6167,
       services: ['Délivrance médicaments', 'Conseil pharmaceutique', 'Mesure tension'],
       is_24h: false,
-      is_de_garde: true
+      is_de_garde: true,
+      garde_start_date: '2026-03-01',
+      garde_end_date: '2026-03-14'
     },
     {
       id: '2',
@@ -43,7 +50,9 @@
       longitude: -5.6150,
       services: ['Délivrance médicaments', 'Vaccination', 'Tests rapides'],
       is_24h: false,
-      is_de_garde: false
+      is_de_garde: true,
+      garde_start_date: '2026-03-15',
+      garde_end_date: '2026-03-28'
     },
     {
       id: '3',
@@ -56,7 +65,7 @@
       longitude: -5.6180,
       services: ['Urgences', 'Délivrance médicaments', 'Conseil pharmaceutique', 'Livraison à domicile'],
       is_24h: true,
-      is_de_garde: true
+      is_de_garde: false
     },
     {
       id: '4',
@@ -109,6 +118,75 @@
   );
 
   $: pharmaciesDeGarde = pharmacies.filter(p => p.is_de_garde);
+
+  function getGardeStatus(pharmacy: Pharmacy): string {
+    if (!pharmacy.is_de_garde) return 'inactive';
+    
+    const now = new Date();
+    const start = pharmacy.garde_start_date ? new Date(pharmacy.garde_start_date) : null;
+    const end = pharmacy.garde_end_date ? new Date(pharmacy.garde_end_date) : null;
+    
+    if (!start || !end) return 'active';
+    
+    if (now >= start && now <= end) return 'active';
+    return 'inactive';
+  }
+
+  function getDaysRemaining(pharmacy: Pharmacy): number {
+    if (!pharmacy.garde_end_date) return 0;
+    const now = new Date();
+    const end = new Date(pharmacy.garde_end_date);
+    const diff = end.getTime() - now.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  function calculateNextGarde(pharmacy: Pharmacy): { start: string; end: string } {
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(start.getDate() + 1);
+    const end = new Date(start);
+    end.setDate(end.getDate() + GARDE_DURATION_DAYS);
+    
+    return {
+      start: start.toISOString().split('T')[0],
+      end: end.toISOString().split('T')[0]
+    };
+  }
+
+  function activateGarde(pharmacy: Pharmacy) {
+    const dates = calculateNextGarde(pharmacy);
+    pharmacies = pharmacies.map(p => 
+      p.id === pharmacy.id 
+        ? { 
+            ...p, 
+            is_de_garde: true,
+            garde_start_date: dates.start,
+            garde_end_date: dates.end
+          } 
+        : p
+    );
+  }
+
+  function rotateGarde() {
+    // Trouver la pharmacie actuelle en garde
+    const currentGarde = pharmaciesDeGarde.find(p => getGardeStatus(p) === 'active');
+    if (!currentGarde) return;
+
+    // Désactiver la garde actuelle
+    pharmacies = pharmacies.map(p => 
+      p.id === currentGarde.id 
+        ? { ...p, is_de_garde: false, garde_start_date: '', garde_end_date: '' }
+        : p
+    );
+
+    // Trouver la prochaine pharmacie dans la liste
+    const currentIndex = pharmacies.findIndex(p => p.id === currentGarde.id);
+    const nextIndex = (currentIndex + 1) % pharmacies.length;
+    const nextPharmacy = pharmacies[nextIndex];
+
+    // Activer la garde pour la suivante
+    activateGarde(nextPharmacy);
+  }
 
   function openAddModal() {
     editingPharmacy = null;
@@ -191,12 +269,22 @@
     </Button>
   </div>
 
-  <!-- Pharmacies de garde (affichage prioritaire) -->
+  <!-- Cycle de garde actuel -->
   <GlassCard padding="p-4">
-    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 dark:text-white">
-      <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-      Pharmacies de garde ({pharmaciesDeGarde.length})
-    </h2>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold flex items-center gap-2 dark:text-white">
+        <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+        Cycle de garde en cours
+      </h2>
+      <Button on:click={rotateGarde} variant="secondary" className="gap-2 text-sm">
+        <RefreshCw class="w-4 h-4" />
+        Passer au suivant
+      </Button>
+    </div>
+    <p class="text-sm text-gray-500 mb-4">
+      <Calendar class="w-4 h-4 inline mr-1" />
+      Cycle de 2 semaines - Chaque pharmacie fait la garde à tour de rôle
+    </p>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
       {#each pharmaciesDeGarde as pharmacy}
         <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
@@ -209,6 +297,13 @@
               Garde
             </span>
           </div>
+          {#if pharmacy.garde_start_date && pharmacy.garde_end_date}
+            <div class="mt-2 pt-2 border-t border-green-200 dark:border-green-800">
+              <p class="text-xs text-green-700 dark:text-green-400">
+                📅 {new Date(pharmacy.garde_start_date).toLocaleDateString('fr-FR')} - {new Date(pharmacy.garde_end_date).toLocaleDateString('fr-FR')}
+              </p>
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
