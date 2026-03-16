@@ -14,7 +14,8 @@
     MessageSquare,
     FileSignature,
     FolderOpen,
-    Calendar
+    Calendar,
+    Store
   } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
@@ -46,6 +47,7 @@
     { href: '/dashboard/patient', label: 'Accueil', icon: Home },
     { href: '/dashboard/patient/demander', label: 'Demander un soin', icon: PlusCircle },
     { href: '/dashboard/patient/rendez-vous', label: 'Rendez-vous', icon: Calendar },
+    { href: '/dashboard/patient/pharmacies', label: 'Pharmacies', icon: Store },
     { href: '/dashboard/patient/medicaments', label: 'Médicaments', icon: Pill },
     { href: '/dashboard/patient/chat', label: 'Messages', icon: MessageSquare },
     { href: '/dashboard/patient/ordonnances', label: 'Ordonnances', icon: FileSignature },
