@@ -22,6 +22,9 @@
 
   // Cycle de garde : 2 semaines
   const GARDE_DURATION_DAYS = 14;
+  
+  // Nombre de pharmacies en garde en même temps
+  const PHARMACIES_EN_GARDE = 5;
 
   let pharmacies: Pharmacy[] = [
     {
@@ -140,9 +143,8 @@
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
-  function calculateNextGarde(pharmacy: Pharmacy): { start: string; end: string } {
-    const now = new Date();
-    const start = new Date(now);
+  function calculateNextGarde(startDate: Date): { start: string; end: string } {
+    const start = new Date(startDate);
     start.setDate(start.getDate() + 1);
     const end = new Date(start);
     end.setDate(end.getDate() + GARDE_DURATION_DAYS);
@@ -153,39 +155,43 @@
     };
   }
 
-  function activateGarde(pharmacy: Pharmacy) {
-    const dates = calculateNextGarde(pharmacy);
+  function activateMultipleGarde(pharmacyIds: string[], startDate: Date) {
+    const dates = calculateNextGarde(startDate);
     pharmacies = pharmacies.map(p => 
-      p.id === pharmacy.id 
+      pharmacyIds.includes(p.id)
         ? { 
             ...p, 
             is_de_garde: true,
             garde_start_date: dates.start,
             garde_end_date: dates.end
           } 
-        : p
+        : { ...p, is_de_garde: false, garde_start_date: '', garde_end_date: '' }
     );
   }
 
   function rotateGarde() {
-    // Trouver la pharmacie actuelle en garde
-    const currentGarde = pharmaciesDeGarde.find(p => getGardeStatus(p) === 'active');
-    if (!currentGarde) return;
+    // Trouver les pharmacies actuelles en garde
+    const currentGardeList = pharmaciesDeGarde.filter(p => getGardeStatus(p) === 'active');
+    if (currentGardeList.length === 0) return;
 
-    // Désactiver la garde actuelle
+    // Trouver l'index de la dernière pharmacie en garde
+    const lastIndex = pharmacies.findIndex(p => p.id === currentGardeList[currentGardeList.length - 1].id);
+    
+    // Désactiver toutes les pharmacies en garde
     pharmacies = pharmacies.map(p => 
-      p.id === currentGarde.id 
+      currentGardeList.find(cp => cp.id === p.id)
         ? { ...p, is_de_garde: false, garde_start_date: '', garde_end_date: '' }
         : p
     );
 
-    // Trouver la prochaine pharmacie dans la liste
-    const currentIndex = pharmacies.findIndex(p => p.id === currentGarde.id);
-    const nextIndex = (currentIndex + 1) % pharmacies.length;
-    const nextPharmacy = pharmacies[nextIndex];
+    // Activer les PHARMACIES_EN_GARDE prochaines pharmacies
+    const newGardeIds: string[] = [];
+    for (let i = 0; i < PHARMACIES_EN_GARDE; i++) {
+      const nextIndex = (lastIndex + i + 1) % pharmacies.length;
+      newGardeIds.push(pharmacies[nextIndex].id);
+    }
 
-    // Activer la garde pour la suivante
-    activateGarde(nextPharmacy);
+    activateMultipleGarde(newGardeIds, new Date());
   }
 
   function openAddModal() {
@@ -274,24 +280,25 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold flex items-center gap-2 dark:text-white">
         <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-        Cycle de garde en cours
+        Pharmacies de garde ({pharmaciesDeGarde.length})
       </h2>
       <Button on:click={rotateGarde} variant="secondary" className="gap-2 text-sm">
         <RefreshCw class="w-4 h-4" />
-        Passer au suivant
+        Changer le cycle
       </Button>
     </div>
     <p class="text-sm text-gray-500 mb-4">
       <Calendar class="w-4 h-4 inline mr-1" />
-      Cycle de 2 semaines - Chaque pharmacie fait la garde à tour de rôle
+      Cycle de 2 semaines - {PHARMACIES_EN_GARDE} pharmacies en garde simultanément
     </p>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid md:grid-cols-{Math.min(pharmaciesDeGarde.length, 5)} gap-4">
       {#each pharmaciesDeGarde as pharmacy}
         <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
           <div class="flex items-start justify-between">
             <div>
               <h3 class="font-semibold dark:text-white">{pharmacy.name}</h3>
               <p class="text-sm text-gray-500">{pharmacy.address}</p>
+              <p class="text-xs text-green-600 dark:text-green-400 mt-1">{pharmacy.phone}</p>
             </div>
             <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">
               Garde
