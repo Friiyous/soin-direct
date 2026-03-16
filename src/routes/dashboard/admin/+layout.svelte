@@ -11,7 +11,8 @@
     LogOut,
     Menu,
     X,
-    BarChart3
+    BarChart3,
+    Store
   } from 'lucide-svelte';
   import { browser } from '$app/environment';
   import Toast from '$lib/components/ui/Toast.svelte';
@@ -34,6 +35,7 @@
     { href: '/dashboard/admin', label: 'Command Center', icon: LayoutDashboard },
     { href: '/dashboard/admin/missions', label: 'Missions', icon: ClipboardList },
     { href: '/dashboard/admin/professionnels', label: 'Professionnels', icon: Shield },
+    { href: '/dashboard/admin/pharmacies', label: 'Pharmacies', icon: Store },
     { href: '/dashboard/admin/utilisateurs', label: 'Patients', icon: Users },
     { href: '/dashboard/admin/rapports', label: 'Rapports', icon: BarChart3 }
   ];

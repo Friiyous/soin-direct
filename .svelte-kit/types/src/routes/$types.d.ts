@@ -12,7 +12,7 @@ type EnsureDefined<T> = T extends null | undefined ? {} : T;
 type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends U ? keyof U : never> = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
 export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageParentData = EnsureDefined<LayoutData>;
-type LayoutRouteId = RouteId | "/" | "/auth/login" | "/auth/register" | "/dashboard/admin" | "/dashboard/admin/missions" | "/dashboard/admin/professionnels" | "/dashboard/admin/rapports" | "/dashboard/admin/utilisateurs" | "/dashboard/patient" | "/dashboard/patient/chat" | "/dashboard/patient/demander" | "/dashboard/patient/dossier" | "/dashboard/patient/historique" | "/dashboard/patient/medicaments" | "/dashboard/patient/onboarding" | "/dashboard/patient/ordonnances" | "/dashboard/patient/rendez-vous" | "/dashboard/pro" | "/dashboard/pro/suivi" | "/offline" | "/video" | null
+type LayoutRouteId = RouteId | "/" | "/auth/login" | "/auth/register" | "/dashboard/admin" | "/dashboard/admin/missions" | "/dashboard/admin/pharmacies" | "/dashboard/admin/professionnels" | "/dashboard/admin/rapports" | "/dashboard/admin/utilisateurs" | "/dashboard/patient" | "/dashboard/patient/chat" | "/dashboard/patient/demander" | "/dashboard/patient/dossier" | "/dashboard/patient/historique" | "/dashboard/patient/medicaments" | "/dashboard/patient/onboarding" | "/dashboard/patient/ordonnances" | "/dashboard/patient/pharmacies" | "/dashboard/patient/rendez-vous" | "/dashboard/pro" | "/dashboard/pro/suivi" | "/offline" | "/video" | null
 type LayoutParams = RouteParams & {  }
 type LayoutParentData = EnsureDefined<{}>;
 
